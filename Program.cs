@@ -28,11 +28,14 @@ var builder = WebApplication.CreateBuilder(args);
 //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMongoDB(
-        builder.Configuration.GetConnectionString("MongoDbConnection")!, 
-        "FlowerAI"
-    )
-);
+{
+    // Đọc trực tiếp biến MONGO_CONNECTION_STRING từ Render, 
+    // nếu chạy local không thấy thì fallback về "MongoDbConnection" trong appsettings.json
+    var connectionString = builder.Configuration["MONGO_CONNECTION_STRING"]
+                        ?? builder.Configuration.GetConnectionString("MongoDbConnection");
+
+    options.UseMongoDB(connectionString!, "FlowerAI");
+});
 // ── Redis ─────────────────────────────────────────────────
 var redisConn = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
 builder.Services.AddSingleton<IConnectionMultiplexer>(
