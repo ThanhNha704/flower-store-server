@@ -24,9 +24,15 @@ catch
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database ──────────────────────────────────────────────
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMongoDB(
+        builder.Configuration.GetConnectionString("MongoDbConnection")!, 
+        "FlowerAI"
+    )
+);
 // ── Redis ─────────────────────────────────────────────────
 var redisConn = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
 builder.Services.AddSingleton<IConnectionMultiplexer>(
